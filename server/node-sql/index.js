@@ -1,19 +1,33 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 8080;
-const { postsController } = require('./controllers/postsController.js');
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+const port = process.env.PORT || 8081;
+const vacationData = require('./data/vacation.json');
+const { postsRouter } = require('./routers/postsRouter.js');
+
 app.use((req, res, next) => {
- res.set('Access-Control-Allow-Origin', '*');
- res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
- res.set('Access-Control-Allow-Methods', "GET, POST, PUT, DELETE");
- res.set('Content-Type', 'application/json');
- next();
+    res.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+        'Access-Control-Allow-Methods': "GET, POST, PUT, DELETE",
+        'Content-Type': 'application/json'
+    });
+    next();
 });
-app.get("/posts", async (req, res) => {
- res.status(200).send(await postsController.getPosts());
+
+app.get("/api/vacation", (req, res) => {
+    res.json(vacationData);
 });
-app.listen(port);
-console.log(`listening on port ${port}`);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/posts', postsRouter);
+
+app.use((req, res) => {
+    res.status(400).send('something is broken!');
+});
+
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+});

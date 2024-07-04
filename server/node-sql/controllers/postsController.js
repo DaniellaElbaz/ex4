@@ -4,7 +4,7 @@ exports.postsController = {
     const connection = await dbConnection.createConnection();
     const [rows] = await connection.execute(`SELECT * from tbl_22_posts`);
     connection.end();
-    return rows;
+    res.json(rows);
    },
    async getPost(req,res){
     const { dbConnection } = require('../db_connection');

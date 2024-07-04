@@ -1,6 +1,6 @@
 let data;
 window.onload = () => {
-    fetch("../data/vacation.json")
+    fetch("http://127.0.0.1:8081/api/vacation")
     .then(response => response.json())
     .then(data => fillHeader(data));
 }
