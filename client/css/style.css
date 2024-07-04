@@ -7,16 +7,14 @@ header, main, footer, nav, aside, section, article, div {
 }
 body {
     font-family: Arial, Helvetica, sans-serif;
-    box-sizing: border-box;
+    background-image: url("../images/background.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+   
 }
 #backgroundImg{
-   /* background-image: url("../images/background.jpg");
-    opacity: 0.5;
     width: 100%;
-    height: calc(100vh - 150px);
-    background-repeat: no-repeat;
-    background-size: cover;*/
-
+    opacity: 0.5;
 }
 #wrapper {
     margin: 0px 32px;

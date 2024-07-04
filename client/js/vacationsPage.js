@@ -44,8 +44,38 @@ function userLog(){
     const loginButton = document.createElement('button');
     loginButton.classList.add('btn');
     loginButton.innerText = 'Login';
+    loginButton.onclick = function () {
+        addUser(userName.value, passwordInput.value);
+    };
     form.appendChild(loginButton);
     main.appendChild(form);
+
+function addUser(userName, password) {
+    console.log("imhere");
+    const jsonSend = {
+        userName,password}
+    fetch("http://127.0.0.1:8081/api/posts", {
+        
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+            body: JSON.stringify(jsonSend)
+        })
+       
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('User added successfully. Access code: ' + data.access_code);
+                console.log("imhere");
+            } else {
+                alert('Error adding user: ' + data.message);
+                console.log("imhere");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 function initPlaces(){
     let inputregretsContainer = document.createElement('div');
@@ -88,4 +118,4 @@ function initPlaces(){
     inputregretsContainer.appendChild(inputName);
     inputregretsContainer.appendChild(initMembersBox(inputDetails));
     return inputregretsContainer;
-}
+}}
