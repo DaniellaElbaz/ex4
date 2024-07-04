@@ -1,4 +1,4 @@
-let data;
+
 window.onload = () => {
     fetch("http://127.0.0.1:8081/api/vacation")
     .then(response => response.json())
@@ -10,9 +10,42 @@ function fillHeader(data){
     header.innerText= `${data.category}`;
     let addVacationButton = document.createElement('button');
     addVacationButton.classList.add('addVacationButton');
-    addVacationButton.innerText="add your vacation";
+    addVacationButton.innerText="Login / Log";
+    addVacationButton.onclick = function () {
+        userLog();
+    }
     headerTitle.appendChild(header);
     headerTitle.appendChild(addVacationButton);
+}
+function userLog(){
+    let main = document.getElementsByTagName('main')[0];
+    main.innerHTML="";
+    const form = document.createElement('form');
+    form.classList.add('form-container');
+    const heading = document.createElement('h1');
+    heading.innerText = 'Login';
+    form.appendChild(heading);
+    const userNameLabel = document.createElement('label');
+    userNameLabel.htmlFor = 'user_name';
+    userNameLabel.innerText = 'user name';
+    form.appendChild(userNameLabel);
+    const userName = document.createElement('input');
+    userName.id = 'user_name';
+    userName.placeholder = 'Enter user name';
+    form.appendChild(userName);
+    const passwordLabel = document.createElement('label');
+    passwordLabel.htmlFor = 'password';
+    passwordLabel.innerText = 'Password';
+    form.appendChild(passwordLabel);
+    const passwordInput = document.createElement('input');
+    passwordInput.id = 'password';
+    passwordInput.placeholder = 'Enter Password';
+    form.appendChild(passwordInput);
+    const loginButton = document.createElement('button');
+    loginButton.classList.add('btn');
+    loginButton.innerText = 'Login';
+    form.appendChild(loginButton);
+    main.appendChild(form);
 }
 function initPlaces(){
     let inputregretsContainer = document.createElement('div');

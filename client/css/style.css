@@ -7,14 +7,15 @@ header, main, footer, nav, aside, section, article, div {
 }
 body {
     font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
 }
 #backgroundImg{
-    background-image: url("../images/background.jpg");
+   /* background-image: url("../images/background.jpg");
     opacity: 0.5;
     width: 100%;
     height: calc(100vh - 150px);
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: cover;*/
 
 }
 #wrapper {
@@ -29,7 +30,10 @@ header{
     align-items: center;
     flex-direction: column;
 }
-
+main{
+    width: 100%;
+    height: calc(100vh - 150px);
+}
 header h1{
     font-family: helvetica;
 }
@@ -44,3 +48,30 @@ header h1{
     margin-top: 20px;
     border-color: #4caf50;
 }
+
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+  .form-container input {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #f1f1f1;
+  }
+
+  .form-container .btn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 16px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom:10px;
+    opacity: 0.8;
+  }
+  .form-container .btn:hover, .open-button:hover {
+    opacity: 1;
+  }
