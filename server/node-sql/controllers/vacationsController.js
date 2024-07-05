@@ -33,7 +33,7 @@ exports.vacationsController = {
                   }
                 const place = location;
                 const userName = user.name;
-                const values = [ place, startDate, userName, endDate];
+                const values = [ place, startDate, userName, endDate ,vacationType];
                 await bookVacation(req, res, values);
             } catch (error) {
                 console.error('Error choosing vacation:', error);
@@ -45,8 +45,8 @@ exports.vacationsController = {
         try {
             const connection = await dbConnection.createConnection();
             const query = `
-                INSERT INTO tbl_22_vacations ( place, start_date, user_name, end_date)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO tbl_22_vacations ( place, start_date, user_name, end_date , vacationType)
+                VALUES (?, ?, ?, ? ,?)
             `;
             const [result] = await connection.execute(query, values);
             connection.end();
@@ -78,9 +78,9 @@ exports.vacationsController = {
             }
             const query = `
                 UPDATE tbl_22_vacations
-                SET place = ?, start_date = ?, end_date = ?
+                SET place = ?, start_date = ?, end_date = ? ,vacationType =?
                 WHERE user_name = ?`;
-            const values = [location,startDate, endDate, user.name];
+            const values = [location,startDate, endDate,vacationType, user.name];
             const [result] = await connection.execute(query, values);
             connection.end();
             if (result.affectedRows > 0) {
@@ -90,6 +90,94 @@ exports.vacationsController = {
             }
         } catch (error) {
             console.error('Error updating vacation details:', error);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+    },
+    async calculateVacationResults(req,res) {
+        const { dbConnection } = require('../db_connection');
+        try {
+            const connection = await dbConnection.createConnection();
+            const [members] = await connection.execute('SELECT * FROM tbl_22_vacations');
+            connection.end();
+            const allPreferencesFilled =  members.every(member => member.place && member.vacationType && member.startDate && member.endDate);
+            console.log('Members:', members);
+            if (!allPreferencesFilled && members.length != 5) {
+                return res.status(400).json({ success: false, message: "We have to wait for everyone's preferences." });
+            }
+            const validateDate = (date) => {
+                return /^\d{4}-\d{2}-\d{2}$/.test(date) && !isNaN(new Date(date).getTime());
+            };
+    
+            const invalidDates = members.filter(member => !validateDate(member.start_date.toISOString().split('T')[0]) || !validateDate(member.end_date.toISOString().split('T')[0]));
+            if (invalidDates.length > 0) {
+                console.log('Invalid Date Entries:', invalidDates);
+                return res.status(400).json({ success: false, message: "Invalid date values provided." });
+            }
+            const placeCount = {};
+            members.forEach(member => {
+                if (member.place) {
+                    if (placeCount[member.place]) {
+                        placeCount[member.place]++;
+                    } else {
+                        placeCount[member.place] = 1;
+                    }
+                }
+            });
+            const places = Object.keys(placeCount);
+            let chosenplace;
+            if (places.length > 0) {
+                chosenplace = places.reduce((a, b) => placeCount[a] > placeCount[b] ? a : b);
+            } else {
+                members.sort((a, b) => a.vacation_code - b.vacation_code);
+                chosenplace = members[0].place;
+            }
+            const typeCount = {};
+            members.forEach(member => {
+                if (member.vacationType) {
+                    if (typeCount[member.vacationType]) {
+                        typeCount[member.vacationType]++;
+                    } else {
+                        typeCount[member.vacationType] = 1;
+                    }
+                }
+            });
+            const vacationTypes = Object.keys(typeCount);
+            let chosenVacationType;
+            if (vacationTypes.length > 0) {
+                chosenVacationType = vacationTypes.reduce((a, b) => typeCount[a] > typeCount[b] ? a : b);
+            } else {
+                chosenVacationType = members[0].vacationType;
+            }
+            const startDates = members.map(member => new Date(member.start_date));
+        const endDates = members.map(member => new Date(member.end_date));
+        let startDate = new Date(Math.max(...startDates));
+        let endDate = new Date(Math.min(...endDates));
+        if (startDate > endDate) {
+            return res.status(400).json({ success: false, message: "Invalid date range." });
+        }
+        startDate = startDate.toISOString().split('T')[0];
+        endDate = endDate.toISOString().split('T')[0];
+            res.json({
+                success: true,
+                place: chosenplace,
+                vacationType: chosenVacationType,
+                startDate: startDate,
+                endDate: endDate
+            });
+        } catch (error) {
+            console.error('Error fetching vacations:', error);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+    },
+    async getVacations(req, res) {
+        const { dbConnection } = require('../db_connection');
+        try {
+            const connection = await dbConnection.createConnection();
+            const [vacations] = await connection.execute('SELECT * FROM tbl_22_vacations');
+            connection.end();
+            res.json({ success: true, vacations });
+        } catch (error) {
+            console.error('Error fetching vacations:', error);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
     }
