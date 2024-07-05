@@ -4,6 +4,9 @@ exports.vacationsController = {
         const { vacationsController } = require('./vacationsController');
         const { bookVacation } = vacationsController;
         console.log('bookVacation:', bookVacation);
+        const { usersController } = require('./usersController');
+        const { getUser } = usersController;
+        console.log('getUser:', getUser);
         const { vacationType, location, startDate, endDate, user } = req.body;
         if (!vacationType || !location || !startDate || !endDate || !user) {
             return res.status(400).json({ success: false, message: 'Vacation type, location, start date, end date, and user details are required' });
@@ -20,11 +23,22 @@ exports.vacationsController = {
         if (!destinations.includes(location) || !vacationTypes.includes(vacationType)) {
             return res.status(400).json({ success: false, message: 'Invalid vacation type or location' });
         }
-        const place = location;
-        const userName = user.name;
-        const values = [ place, startDate, userName, endDate];
-        await bookVacation(req, res, values);
-        res.json({ success: true, message: 'Vacation booked successfully!' });
+        if (!user.name || !user.access_code) {
+            return res.status(400).json({ success: false, message: 'Invalid user details' });
+        }
+        try {
+             const userInDatabase = await getUser(user.name, user.access_code);
+             if (!userInDatabase) {
+                 return res.status(404).json({ success: false, message: 'User not found in database' });
+                  }
+                const place = location;
+                const userName = user.name;
+                const values = [ place, startDate, userName, endDate];
+                await bookVacation(req, res, values);
+            } catch (error) {
+                console.error('Error choosing vacation:', error);
+                res.status(500).json({ success: false, message: 'Internal Server Error' });
+            }
     },
     async bookVacation(req, res, values) {
         const { dbConnection } = require('../db_connection');
@@ -41,5 +55,5 @@ exports.vacationsController = {
             console.error('Error booking vacation:', error);
             res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
-    }
+    },
 };

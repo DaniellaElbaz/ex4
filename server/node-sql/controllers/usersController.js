@@ -1,12 +1,21 @@
 exports.usersController = {
-        async getUsers(req, res) {
+        async getUser(userName, accessCode) {
             const { dbConnection } = require('../db_connection');
             try {
                 const connection = await dbConnection.createConnection();
-                const [rows] = await connection.execute('SELECT * from tbl_22_users');
-                connection.end();
-                console.log('Users fetched:', rows);
-                res.json(rows);
+                try {
+                    const [rows] = await connection.execute('SELECT * FROM tbl_22_users WHERE name = ? AND access_code = ?', [userName, accessCode]);
+                    if (rows.length > 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                    } catch (error) {
+                        console.error('Error verifying user in database:', error);
+                        throw error;
+                    } finally {
+                        connection.end();
+                    }
             } catch (error) {
                 console.error('Error fetching users:', error);
                 res.status(500).json({ success: false, message: 'Internal Server Error' });
