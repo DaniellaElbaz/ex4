@@ -1,52 +1,5 @@
 {
-    "category": "vacation list",
-    "places": [
-        {
-            "place":"London"
-        },
-        {
-            "place":"Paris"
-        },
-        {
-            "place":"Tuscany"
-        },
-        {
-            "place":"Peru"
-        },
-        {
-            "place":"Rome"
-        },
-        {
-            "place":"Barcelona"
-        },
-        {
-            "place":"Athens"
-       },
-       {
-           "place":"Marrakech"
-       },
-       {
-            "place":"Madrid"
-       },
-       {
-            "place":"Amsterdam"
-       }
-    ],
-       "types": [
-        {
-            "type":"Culture"
-        },
-        {
-            "type":"Nature"
-        },
-        {
-            "type":"History"
-        },
-        {
-            "type":"Relax"
-        },
-        {
-            "type":"Party"
-        }
-   ]
-}
+    "destinations": ["Paris", "New York", "Tokyo", "London", "Berlin", "Rome", "Madrid", "Sydney", "Moscow", "Dubai"],
+    "vacationTypes": ["Relaxation", "Beach", "Parks", "Adventure", "Cultural"]
+  }
+  
