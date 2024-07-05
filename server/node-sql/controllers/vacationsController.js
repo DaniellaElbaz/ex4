@@ -56,4 +56,41 @@ exports.vacationsController = {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
     },
+    async updateVacationDetails(req, res) {
+        const { dbConnection } = require('../db_connection');
+        const { usersController } = require('./usersController');
+        const { getUser } = usersController;
+        console.log('getUser:', getUser);
+        const { vacationType, location, startDate, endDate, user } = req.body;
+        console.log( vacationType, location, startDate, endDate, user );
+        if (!vacationType || !location || !startDate || !endDate || !user) {
+            return res.status(400).json({ success: false, message: 'Access code and updated values are required' });
+        }
+        try {
+            const connection = await dbConnection.createConnection();
+            const userInDatabase = await getUser(user.name, user.access_code);
+             if (!userInDatabase) {
+                 return res.status(404).json({ success: false, message: 'User not found in database' });
+                  }
+            if (user.length === 0) {
+                connection.end();
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+            const query = `
+                UPDATE tbl_22_vacations
+                SET place = ?, start_date = ?, end_date = ?
+                WHERE user_name = ?`;
+            const values = [location,startDate, endDate, user.name];
+            const [result] = await connection.execute(query, values);
+            connection.end();
+            if (result.affectedRows > 0) {
+                res.json({ success: true, message: 'Vacation details updated successfully' });
+            } else {
+                res.status(404).json({ success: false, message: 'No vacation details found for the user' });
+            }
+        } catch (error) {
+            console.error('Error updating vacation details:', error);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
+    }
 };
