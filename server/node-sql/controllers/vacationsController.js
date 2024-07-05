@@ -1,6 +1,9 @@
 exports.vacationsController = {
     async chooseVacation(req, res) {
-        const vacationData = require('../data/vacationData.json');
+        const vacationData = require('../data/vacation.json');
+        const { vacationsController } = require('./vacationsController');
+        const { bookVacation } = vacationsController;
+        console.log('bookVacation:', bookVacation);
         const { vacationType, location, startDate, endDate, user } = req.body;
         if (!vacationType || !location || !startDate || !endDate || !user) {
             return res.status(400).json({ success: false, message: 'Vacation type, location, start date, end date, and user details are required' });
@@ -28,8 +31,8 @@ exports.vacationsController = {
         try {
             const connection = await dbConnection.createConnection();
             const query = `
-                INSERT INTO tbl_vacations (vacation_code, place, start_date, user_name, end_date)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO tbl_22_vacations ( place, start_date, user_name, end_date)
+                VALUES (?, ?, ?, ?)
             `;
             const [result] = await connection.execute(query, values);
             connection.end();

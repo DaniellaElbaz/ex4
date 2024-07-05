@@ -38,7 +38,9 @@ exports.usersController = {
          },
          async getUserByAccessCode(req, res) {
             const { dbConnection } = require('../db_connection');
-            const { chooseVacation } = require('./vacationsController');
+            const { vacationsController } = require('./vacationsController');
+            const { chooseVacation } = vacationsController;
+            console.log('chooseVacation:', chooseVacation);
             const { access_code } = req.body;
             if (!access_code) {
                 return res.status(400).json({ success: false, message: 'Access code is required' });
@@ -52,7 +54,7 @@ exports.usersController = {
                 }
                 connection.end();
                 req.body.user = user[0];
-                chooseVacation(req, res);
+                await chooseVacation(req, res);
             } catch (error) {
                 console.error('Error fetching user by access code:', error);
                 res.status(500).json({ success: false, message: 'Internal Server Error' });
