@@ -50,29 +50,5 @@ exports.usersController = {
                 console.error('Error adding user:', error);
                 res.status(500).json({ success: false, message: 'Internal Server Error' });
             }
-         },
-         async getUserByAccessCode(req, res) {
-            const { dbConnection } = require('../db_connection');
-            const { vacationsController } = require('./vacationsController');
-            const { chooseVacation } = vacationsController;
-            console.log('chooseVacation:', chooseVacation);
-            const { access_code } = req.body;
-            if (!access_code) {
-                return res.status(400).json({ success: false, message: 'Access code is required' });
-            }
-            try {
-                const connection = await dbConnection.createConnection();
-                const [user] = await connection.execute('SELECT * FROM tbl_22_users WHERE access_code = ?', [access_code]);
-                if (user.length === 0) {
-                    connection.end();
-                    return res.status(404).json({ success: false, message: 'User not found' });
-                }
-                connection.end();
-                req.body.user = user[0];
-                await chooseVacation(req, res);
-            } catch (error) {
-                console.error('Error fetching user by access code:', error);
-                res.status(500).json({ success: false, message: 'Internal Server Error' });
-            }
-        }
+         }
 };
