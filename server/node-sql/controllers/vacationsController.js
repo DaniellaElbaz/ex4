@@ -1,5 +1,6 @@
 exports.vacationsController = {
     async chooseVacation(req, res) {
+        const { dbConnection } = require('../db_connection');
         const vacationData = require('../data/vacation.json');
         const { vacationsController } = require('./vacationsController');
         const { bookVacation } = vacationsController;
@@ -27,18 +28,24 @@ exports.vacationsController = {
             return res.status(400).json({ success: false, message: 'Invalid user details' });
         }
         try {
-             const userInDatabase = await getUser(user.name, user.access_code);
-             if (!userInDatabase) {
-                 return res.status(404).json({ success: false, message: 'User not found in database' });
-                  }
-                const place = location;
-                const userName = user.name;
-                const values = [ place, startDate, userName, endDate ,vacationType];
-                await bookVacation(req, res, values);
-            } catch (error) {
-                console.error('Error choosing vacation:', error);
-                res.status(500).json({ success: false, message: 'Internal Server Error' });
+            const userInDatabase = await getUser(user.name, user.access_code);
+            if (!userInDatabase) {
+                return res.status(404).json({ success: false, message: 'User not found in database' });
             }
+            const connection = await dbConnection.createConnection();
+            const [existingVacation] = await connection.execute('SELECT * FROM tbl_22_vacations WHERE user_name = ?', [user.name]);
+            connection.end();
+            if (existingVacation.length > 0) {
+                return res.status(400).json({ success: false, message: 'User already has a vacation booked' });
+            }
+            const place = location;
+            const userName = user.name;
+            const values = [ place, startDate, userName, endDate ,vacationType];
+            await bookVacation(req, res, values);
+        } catch (error) {
+            console.error('Error choosing vacation:', error);
+            res.status(500).json({ success: false, message: 'Internal Server Error' });
+        }
     },
     async bookVacation(req, res, values) {
         const { dbConnection } = require('../db_connection');
