@@ -30,6 +30,12 @@ exports.usersController = {
             }
             try {
                 const connection = await dbConnection.createConnection();
+                const [userCountResult] = await connection.execute('SELECT COUNT(*) AS userCount FROM tbl_22_users');
+                const userCount = userCountResult[0].userCount;
+                if (userCount >= 5) {
+                    connection.end();
+                    return res.status(400).json({ success: false, message: 'User limit reached. Cannot add more users.' });
+                }
                 const accessCode = randomBytes(8).toString('hex');
                 const [existingUsers] = await connection.execute('SELECT * FROM tbl_22_users WHERE name = ?', [name]);
                 if (existingUsers.length > 0) {
