@@ -1,0 +1,12 @@
+# Exported from Render on 2024-07-06T13:52:11Z
+services:
+- type: web
+  name: ex4
+  runtime: node
+  repo: https://github.com/DaniellaElbaz/ex4
+  plan: free
+  region: oregon
+  buildCommand: npm install
+  startCommand: node index.js
+  healthCheckPath: /opt/render/.cache/_logs/2024-07-06T13_07_10_821Z-debug-0.log
+version: "1"
